@@ -20,9 +20,8 @@ npm install -g pm2
 pm2 startup
 
 # Run Node app
-# DB_HOST=$DB_HOST pm2 start "npm run serve"
-DB_HOST=$DB_HOST pm2 start "$START_COMMAND"
-# TODO: Look into https://pm2.io/docs/runtime/best-practices/environment-variables/ 
+PORT=$PORT DB_USER=$DB_USER DB_PASS=$DB_PASS DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME pm2 start "$START_COMMAND"
+# TODO: Look into https://pm2.io/docs/runtime/best-practices/environment-variables/
 
 # Install Caddy
 sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl

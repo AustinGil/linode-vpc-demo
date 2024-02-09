@@ -1,10 +1,4 @@
-const DB_USER = "mydbuser"
-const DB_PASS = "mydbpass"
-const DB_HOST = "172.232.190.75"
-const DB_PORT = 5432
-const DB_NAME = "mydbname"
-// const DB_NAME = "postgres"
-// psql -h lin-74460-45521-pgsql-primary.servers.linodedb.net -p 5432 -U linpostgres postgres
+import { DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME } from './src/config.js'
 
 /** @type { import("drizzle-kit").Config } */
 export default {

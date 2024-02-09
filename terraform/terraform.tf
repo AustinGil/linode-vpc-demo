@@ -18,6 +18,10 @@ variable "START_COMMAND" {}
 variable "DB_NAME" {}
 variable "DB_USER" {}
 variable "DB_PASS" {}
+variable "DB_PORT" {
+  type = string
+  default = 5432
+}
 variable "region" {
   type = string
   default = "us-sea" # see https://api.linode.com/v4/regions
@@ -89,8 +93,7 @@ resource "null_resource" "configure_server" {
     inline = [
       "git clone https://github.com/AustinGil/linode-vpc-demo.git app && cd app",
       # Must be same command, not comma-separated
-      # "DOMAIN=${var.DOMAIN} PORT=${var.PORT} DB_HOST=${linode_instance.application.ip_address} START_COMMAND=${var.START_COMMAND} bash ./server-init.sh"
-      "DOMAIN=${var.DOMAIN} PORT=${var.PORT} DB_HOST=${linode_instance.application.ip_address} START_COMMAND=\"node app/server/entry.node-server\" bash ./terraform/server-init.sh"
+      "DOMAIN=${var.DOMAIN} PORT=${var.PORT} DB_USER=${var.DB_USER} DB_PASS=${var.DB_PASS} DB_HOST=${linode_instance.application.ip_address} DB_PORT=${var.DB_PORT} DB_NAME=${var.DB_NAME} START_COMMAND=${var.START_COMMAND} bash ./terraform/server-init.sh"
     ]
   }
 }
