@@ -20,6 +20,8 @@ npm install -g pm2
 pm2 startup
 
 # Run Node app
+DB_USER=$DB_USER DB_PASS=$DB_PASS DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME npm run db.push
+DB_USER=$DB_USER DB_PASS=$DB_PASS DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME npm run db.seed
 PORT=$PORT DB_USER=$DB_USER DB_PASS=$DB_PASS DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME pm2 start "$START_COMMAND"
 # TODO: Look into https://pm2.io/docs/runtime/best-practices/environment-variables/
 
@@ -31,8 +33,10 @@ sudo apt update
 sudo apt install caddy
 
 # Configure Caddy
-echo "$DOMAIN {
-  auto_https off
+echo "{
+  acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+$DOMAIN {
   file_server
   reverse_proxy localhost:$PORT
 }" > /etc/caddy/Caddyfile
