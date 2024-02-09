@@ -2,6 +2,8 @@
 
 sudo apt update
 
+# git clone https://github.com/AustinGil/linode-vpc-demo.git app
+
 # Install NVM
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
@@ -11,6 +13,8 @@ source ~/.bashrc
 # Install Node
 nvm install 20
 
+# cd app
+npm install
 npm run build
 
 # Install PM2

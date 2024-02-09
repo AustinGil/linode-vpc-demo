@@ -79,35 +79,35 @@ resource "linode_instance" "application" {
 }
 
 # configure web nodes
-resource "null_resource" "copy_files" {
-  connection {
-    type = "ssh"
-    user = "root"
-    agent = "true"
-    host = "${linode_instance.application.ip_address}"
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "mkdir qwik-app"
-    ]
-  }
-  provisioner "file" {
-    source      = "app.mjs"
-    destination = "app.mjs" 
-  }
-  provisioner "file" {
-    source      = "server-init.sh"
-    destination = "server-init.sh" 
-  }
-  provisioner "file" {
-    source      = "qwik-app/"
-    destination = "qwik-app"
-  }
-}
+# resource "null_resource" "copy_files" {
+#   connection {
+#     type = "ssh"
+#     user = "root"
+#     agent = "true"
+#     host = "${linode_instance.application.ip_address}"
+#   }
+#   provisioner "remote-exec" {
+#     inline = [
+#       "mkdir qwik-app"
+#     ]
+#   }
+#   provisioner "file" {
+#     source      = "app.mjs"
+#     destination = "app.mjs" 
+#   }
+#   provisioner "file" {
+#     source      = "server-init.sh"
+#     destination = "server-init.sh" 
+#   }
+#   provisioner "file" {
+#     source      = "qwik-app/"
+#     destination = "qwik-app"
+#   }
+# }
 resource "null_resource" "configure_server" {
-  depends_on = [
-    null_resource.copy_files
-  ]
+  # depends_on = [
+  #   null_resource.copy_files
+  # ]
   connection {
     type = "ssh"
     user = "root"
@@ -116,6 +116,7 @@ resource "null_resource" "configure_server" {
   }
   provisioner "remote-exec" {
     inline = [
+      "git clone https://github.com/AustinGil/linode-vpc-demo.git app && cd app",
       # Must be same command, not comma-separated
       # "DOMAIN=${var.DOMAIN} PORT=${var.PORT} DB_HOST=${linode_instance.application.ip_address} START_COMMAND=${var.START_COMMAND} bash ./server-init.sh"
       "DOMAIN=${var.DOMAIN} PORT=${var.PORT} DB_HOST=${linode_instance.application.ip_address} START_COMMAND=\"node app/server/entry.node-server\" bash ./server-init.sh"
