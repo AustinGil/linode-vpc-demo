@@ -78,36 +78,7 @@ resource "linode_instance" "application" {
   }
 }
 
-# configure web nodes
-# resource "null_resource" "copy_files" {
-#   connection {
-#     type = "ssh"
-#     user = "root"
-#     agent = "true"
-#     host = "${linode_instance.application.ip_address}"
-#   }
-#   provisioner "remote-exec" {
-#     inline = [
-#       "mkdir qwik-app"
-#     ]
-#   }
-#   provisioner "file" {
-#     source      = "app.mjs"
-#     destination = "app.mjs" 
-#   }
-#   provisioner "file" {
-#     source      = "server-init.sh"
-#     destination = "server-init.sh" 
-#   }
-#   provisioner "file" {
-#     source      = "qwik-app/"
-#     destination = "qwik-app"
-#   }
-# }
 resource "null_resource" "configure_server" {
-  # depends_on = [
-  #   null_resource.copy_files
-  # ]
   connection {
     type = "ssh"
     user = "root"
@@ -128,7 +99,7 @@ resource "null_resource" "configure_server" {
 resource "linode_domain_record" "dns_record" {
   domain_id = "${data.linode_domain.domain.id}"
   record_type = "A"
-  target = "${linode_instance.database.ip_address}"
+  target = "${linode_instance.application.ip_address}"
 }
 
 # Database
