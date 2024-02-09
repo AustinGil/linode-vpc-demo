@@ -31,10 +31,6 @@ variable "vpc_subnet_ip" {
   default = "10.0.0.0/24" # see https://api.linode.com/v4/regions
 }
 
-# # output "foo" {
-# #   value = { for tuple in regexall("(.*?)=(.*)", file(".env")) : tuple[0] => tuple[1] }
-# # }
-
 data "linode_domain" "domain" {
   domain = var.DOMAIN
 }
@@ -93,7 +89,7 @@ resource "null_resource" "configure_server" {
     inline = [
       "git clone https://github.com/AustinGil/linode-vpc-demo.git app && cd app",
       # Must be same command, not comma-separated
-      "DOMAIN=${var.DOMAIN} PORT=${var.PORT} DB_USER=${var.DB_USER} DB_PASS=${var.DB_PASS} DB_HOST=${linode_instance.application.ip_address} DB_PORT=${var.DB_PORT} DB_NAME=${var.DB_NAME} START_COMMAND=${var.START_COMMAND} bash ./terraform/server-init.sh"
+      "DOMAIN=${var.DOMAIN} PORT=${var.PORT} DB_USER=${var.DB_USER} DB_PASS=${var.DB_PASS} DB_HOST=${linode_instance.database.ip_address} DB_PORT=${var.DB_PORT} DB_NAME=${var.DB_NAME} START_COMMAND=${var.START_COMMAND} bash ./terraform/server-init.sh"
     ]
   }
 }

@@ -32,6 +32,7 @@ sudo apt install caddy
 
 # Configure Caddy
 echo "$DOMAIN {
+  auto_https off
   file_server
   reverse_proxy localhost:$PORT
 }" > /etc/caddy/Caddyfile
