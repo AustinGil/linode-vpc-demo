@@ -2,8 +2,6 @@
 
 sudo apt update
 
-# git clone https://github.com/AustinGil/linode-vpc-demo.git app
-
 # Install NVM
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
@@ -22,7 +20,8 @@ npm install -g pm2
 pm2 startup
 
 # Run Node app
-DB_HOST=$DB_HOST pm2 start "$START_COMMAND"
+DB_HOST=$DB_HOST pm2 start "npm run serve"
+# DB_HOST=$DB_HOST pm2 start "$START_COMMAND"
 # TODO: Look into https://pm2.io/docs/runtime/best-practices/environment-variables/ 
 
 # Install Caddy

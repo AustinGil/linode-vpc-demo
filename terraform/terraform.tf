@@ -119,7 +119,7 @@ resource "null_resource" "configure_server" {
       "git clone https://github.com/AustinGil/linode-vpc-demo.git app && cd app",
       # Must be same command, not comma-separated
       # "DOMAIN=${var.DOMAIN} PORT=${var.PORT} DB_HOST=${linode_instance.application.ip_address} START_COMMAND=${var.START_COMMAND} bash ./server-init.sh"
-      "DOMAIN=${var.DOMAIN} PORT=${var.PORT} DB_HOST=${linode_instance.application.ip_address} START_COMMAND=\"node app/server/entry.node-server\" bash ./server-init.sh"
+      "DOMAIN=${var.DOMAIN} PORT=${var.PORT} DB_HOST=${linode_instance.application.ip_address} START_COMMAND=\"node app/server/entry.node-server\" bash ./terraform/server-init.sh"
     ]
   }
 }
