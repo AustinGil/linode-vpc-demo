@@ -16,7 +16,7 @@ npm install -g pm2
 pm2 startup
 
 # Build App
-cd app
+# cd app
 npm install
 npm run build
 
