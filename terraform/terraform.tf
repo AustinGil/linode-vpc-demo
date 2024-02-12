@@ -95,10 +95,7 @@ resource "null_resource" "configure_server" {
       "echo \"export DB_PORT=${var.DB_PORT}\" >> ~/.bashrc",
       "echo \"export DB_NAME=${var.DB_NAME}\" >> ~/.bashrc",
       "echo \"export DOMAIN=${var.DOMAIN}\" >> ~/.bashrc",
-    ]
-  }
-  provisioner "remote-exec" {
-    inline = [
+      "source ~/.bashrc",
       "git clone https://github.com/AustinGil/linode-vpc-demo.git app && cd app",
       "bash ./terraform/server-init.sh"
     ]
