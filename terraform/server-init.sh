@@ -23,7 +23,8 @@ npm run build
 # Run Node app
 npm run db.push
 npm run db.seed
-pm2 start "$START_COMMAND"
+# pm2 start "$START_COMMAND"
+pm2 start npm run serve
 # TODO: Look into https://pm2.io/docs/runtime/best-practices/environment-variables/
 
 # Install Caddy
