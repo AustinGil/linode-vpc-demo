@@ -11,7 +11,7 @@ source ~/.bashrc
 # Install Node
 nvm install 20
 
-# cd app
+cd app
 npm install
 npm run build
 

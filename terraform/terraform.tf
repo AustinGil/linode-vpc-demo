@@ -87,16 +87,20 @@ resource "null_resource" "configure_server" {
   }
   provisioner "remote-exec" {
     inline = [
+      "echo \"export NODE_ENV=production\" >> ~/.bashrc",
+      "echo \"export PORT=${var.PORT}\" >> ~/.bashrc",
+      "echo \"export START_COMMAND=${var.START_COMMAND}\" >> ~/.bashrc",
+      "echo \"export DB_USER=${var.DB_USER}\" >> ~/.bashrc",
+      "echo \"export DB_PASS=${var.DB_PASS}\" >> ~/.bashrc",
+      "echo \"export DB_HOST=${linode_instance.database.ip_address}\" >> ~/.bashrc",
+      "echo \"export DB_PORT=${var.DB_PORT}\" >> ~/.bashrc",
+      "echo \"export DB_NAME=${var.DB_NAME}\" >> ~/.bashrc",
+      "echo \"export DOMAIN=${var.DOMAIN}\" >> ~/.bashrc",
+    ]
+  }
+  provisioner "remote-exec" {
+    inline = [
       "git clone https://github.com/AustinGil/linode-vpc-demo.git app && cd app",
-      "export NODE_ENV=production",
-      "export PORT=${var.PORT}",
-      "export START_COMMAND=${var.START_COMMAND}",
-      "export DB_USER=${var.DB_USER}",
-      "export DB_PASS=${var.DB_PASS}",
-      "export DB_HOST=${linode_instance.database.ip_address}",
-      "export DB_PORT=${var.DB_PORT}",
-      "export DB_NAME=${var.DB_NAME}",
-      "export DOMAIN=${var.DOMAIN}",
       "bash ./terraform/server-init.sh"
     ]
   }
