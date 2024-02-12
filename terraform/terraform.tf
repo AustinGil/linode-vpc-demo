@@ -58,6 +58,9 @@ resource "linode_vpc_subnet" "vpc_subnet" {
 
 # VPS
 resource "linode_instance" "application" {
+  depends_on = [
+    linode_instance.database
+  ]
   image = "linode/ubuntu20.04"
   type = "g6-nanode-1"
   label = "${local.app_name}-linode1"
