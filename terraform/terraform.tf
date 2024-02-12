@@ -87,7 +87,6 @@ resource "null_resource" "configure_server" {
   }
   provisioner "remote-exec" {
     inline = [
-      "echo \"export NODE_ENV=production\" >> ~/.bashrc",
       "echo \"export PORT=${var.PORT}\" >> ~/.bashrc",
       "echo \"export START_COMMAND=${var.START_COMMAND}\" >> ~/.bashrc",
       "echo \"export DB_USER=${var.DB_USER}\" >> ~/.bashrc",

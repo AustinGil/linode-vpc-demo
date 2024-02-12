@@ -11,13 +11,14 @@ source ~/.bashrc
 # Install Node
 nvm install 20
 
-cd app
-npm install
-npm run build
-
 # Install PM2
 npm install -g pm2
 pm2 startup
+
+# Build App
+cd app
+npm install
+npm run build
 
 # Run Node app
 npm run db.push
