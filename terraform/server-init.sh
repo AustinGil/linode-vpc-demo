@@ -20,9 +20,9 @@ npm install -g pm2
 pm2 startup
 
 # Run Node app
-DB_USER=$DB_USER DB_PASS=$DB_PASS DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME npm run db.push
-DB_USER=$DB_USER DB_PASS=$DB_PASS DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME npm run db.seed
-PORT=$PORT DB_USER=$DB_USER DB_PASS=$DB_PASS DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME pm2 start "$START_COMMAND"
+npm run db.push
+npm run db.seed
+pm2 start "$START_COMMAND"
 # TODO: Look into https://pm2.io/docs/runtime/best-practices/environment-variables/
 
 # Install Caddy
