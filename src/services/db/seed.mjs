@@ -139,4 +139,6 @@ const main = async () => {
   console.log("Seed done");
 };
 
-main();
+main().then(() => {
+  process.exit()
+})
