@@ -13,7 +13,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 // import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
-import { DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME } from '../../config.js'
+import { DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME } from '../../config.mjs'
 
 // const client = postgres(`postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}`);
 const client = postgres({

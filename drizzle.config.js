@@ -1,4 +1,4 @@
-import { DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME } from './src/config.js'
+import { DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME } from './src/config.mjs'
 
 /** @type { import("drizzle-kit").Config } */
 export default {
