@@ -90,17 +90,17 @@ resource "null_resource" "configure_server" {
   }
   provisioner "remote-exec" {
     inline = [
-      "echo \"export PORT=${var.PORT}\" >> ~/.bashrc",
-      "echo \"export START_COMMAND=${var.START_COMMAND}\" >> ~/.bashrc",
-      "echo \"export DB_USER=${var.DB_USER}\" >> ~/.bashrc",
-      "echo \"export DB_PASS=${var.DB_PASS}\" >> ~/.bashrc",
-      "echo \"export DB_HOST=${linode_instance.database.ip_address}\" >> ~/.bashrc",
-      "echo \"export DB_PORT=${var.DB_PORT}\" >> ~/.bashrc",
-      "echo \"export DB_NAME=${var.DB_NAME}\" >> ~/.bashrc",
-      "echo \"export DOMAIN=${var.DOMAIN}\" >> ~/.bashrc",
-      "source ~/.bashrc",
+      # "echo \"export PORT=${var.PORT}\" >> ~/.bashrc",
+      # "echo \"export START_COMMAND=${var.START_COMMAND}\" >> ~/.bashrc",
+      # "echo \"export DB_USER=${var.DB_USER}\" >> ~/.bashrc",
+      # "echo \"export DB_PASS=${var.DB_PASS}\" >> ~/.bashrc",
+      # "echo \"export DB_HOST=${linode_instance.database.ip_address}\" >> ~/.bashrc",
+      # "echo \"export DB_PORT=${var.DB_PORT}\" >> ~/.bashrc",
+      # "echo \"export DB_NAME=${var.DB_NAME}\" >> ~/.bashrc",
+      # "echo \"export DOMAIN=${var.DOMAIN}\" >> ~/.bashrc",
+      # "source ~/.bashrc",
       "git clone https://github.com/AustinGil/linode-vpc-demo.git app && cd app",
-      "bash ./terraform/server-init.sh"
+      "PORT=${var.PORT} START_COMMAND=${var.START_COMMAND} DB_USER=${var.DB_USER} DB_PASS=${var.DB_PASS} DB_HOST=${linode_instance.database.ip_address} DB_PORT=${var.DB_PORT} DB_NAME=${var.DB_NAME} DOMAIN=${var.DOMAIN} bash ./terraform/server-init.sh"
     ]
   }
 }
