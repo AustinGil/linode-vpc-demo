@@ -16,25 +16,10 @@ npm install -g pm2
 pm2 startup
 
 # Build App
-# cd app
 npm install
 npm run build
 
-# Run Node app
-PORT=$PORT
-DB_USER=$DB_USER
-DB_PASS=$DB_PASS
-DB_HOST=$DB_HOST
-DB_PORT=$DB_PORT
-DB_NAME=$DB_NAME
-# DB_USER=$DB_USER DB_PASS=$DB_PASS DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME npm run db.push
-# DB_USER=$DB_USER DB_PASS=$DB_PASS DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME npm run db.seed
-# PORT=$PORT DB_USER=$DB_USER DB_PASS=$DB_PASS DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME pm2 start "$START_COMMAND"
-npm run db.push
-npm run db.seed
-# pm2 start "$START_COMMAND"
-pm2 start "npm run serve"
-# TODO: Look into https://pm2.io/docs/runtime/best-practices/environment-variables/
+pm2 start $START_COMMAND
 
 # Install Caddy
 sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
@@ -54,8 +39,3 @@ $DOMAIN {
 
 # Reload Caddy
 systemctl reload caddy
-
-echo "$DOMAIN" >> temp.txt
-echo "$PORT" >> temp.txt
-echo "$START_COMMAND" >> temp.txt
-echo "$DB_HOST" >> temp.txt

@@ -12,7 +12,8 @@ locals {
   app_name = "tfVpcDemo"
 }
 variable "LINODE_TOKEN" {}
-variable "DOMAIN" {}
+variable "DOMAIN1" {}
+variable "DOMAIN2" {}
 variable "PORT" {}
 variable "START_COMMAND" {}
 variable "DB_NAME" {}
@@ -28,16 +29,19 @@ variable "region" {
 }
 variable "vpc_subnet_ip" {
   type = string
-  default = "10.0.0.0/24" # see https://api.linode.com/v4/regions
-}
-
-data "linode_domain" "domain" {
-  domain = var.DOMAIN
+  default = "10.0.0.0/24"
 }
 
 # Configure the Linode Provider
 provider "linode" {
   token = var.LINODE_TOKEN
+}
+
+data "linode_domain" "domain1" {
+  domain = var.DOMAIN1
+}
+data "linode_domain" "domain2" {
+  domain = var.DOMAIN2
 }
 
 resource "linode_sshkey" "ssh_key" {
@@ -57,13 +61,24 @@ resource "linode_vpc_subnet" "vpc_subnet" {
 }
 
 # VPS
-resource "linode_instance" "application" {
+resource "linode_instance" "application1" {
   depends_on = [
-    linode_instance.database
+    linode_instance.database2
   ]
   image = "linode/ubuntu20.04"
   type = "g6-nanode-1"
   label = "${local.app_name}-linode1"
+  group = "${local.app_name}-group"
+  region = var.region
+  authorized_keys = [ linode_sshkey.ssh_key.ssh_key ]
+}
+resource "linode_instance" "application2" {
+  depends_on = [
+    linode_instance.database1
+  ]
+  image = "linode/ubuntu20.04"
+  type = "g6-nanode-1"
+  label = "${local.app_name}-linode2"
   group = "${local.app_name}-group"
   region = var.region
   authorized_keys = [ linode_sshkey.ssh_key.ssh_key ]
@@ -74,48 +89,59 @@ resource "linode_instance" "application" {
   interface {
     purpose   = "vpc"
     subnet_id = linode_vpc_subnet.vpc_subnet.id
-    # ip_ranges = [var.vpc_subnet_ip]
     ipv4 {
       vpc = "10.0.0.2"
     }
   }
 }
 
-resource "null_resource" "configure_server" {
+resource "null_resource" "configure_server1" {
   connection {
     type = "ssh"
     user = "root"
     agent = "true"
-    host = "${linode_instance.application.ip_address}"
+    host = "${linode_instance.application1.ip_address}"
   }
   provisioner "remote-exec" {
     inline = [
-      # "echo \"export PORT=${var.PORT}\" >> ~/.bashrc",
-      # "echo \"export START_COMMAND=${var.START_COMMAND}\" >> ~/.bashrc",
-      # "echo \"export DB_USER=${var.DB_USER}\" >> ~/.bashrc",
-      # "echo \"export DB_PASS=${var.DB_PASS}\" >> ~/.bashrc",
-      # "echo \"export DB_HOST=${linode_instance.database.ip_address}\" >> ~/.bashrc",
-      # "echo \"export DB_PORT=${var.DB_PORT}\" >> ~/.bashrc",
-      # "echo \"export DB_NAME=${var.DB_NAME}\" >> ~/.bashrc",
-      # "echo \"export DOMAIN=${var.DOMAIN}\" >> ~/.bashrc",
-      # "source ~/.bashrc",
       "git clone https://github.com/AustinGil/linode-vpc-demo.git app && cd app",
-      "PORT=${var.PORT} START_COMMAND=${var.START_COMMAND} DB_USER=${var.DB_USER} DB_PASS=${var.DB_PASS} DB_HOST=${linode_instance.database.ip_address} DB_PORT=${var.DB_PORT} DB_NAME=${var.DB_NAME} DOMAIN=${var.DOMAIN} bash ./terraform/server-init.sh"
+      # Must use inline env variables
+      "START_COMMAND=${var.START_COMMAND} PORT=${var.NODE_PORT} DB_USER=${var.DB_USER} DB_PASS=${var.DB_PASS} DB_HOST=${linode_instance.database1.ip_address} DB_PORT=${var.DB_PORT} DB_NAME=${var.DB_NAME} DOMAIN1=${var.DOMAIN1} bash ./terraform/server-init.sh"
+    ]
+  }
+}
+resource "null_resource" "configure_server2" {
+  connection {
+    type = "ssh"
+    user = "root"
+    agent = "true"
+    host = "${linode_instance.application2.ip_address}"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "git clone https://github.com/AustinGil/linode-vpc-demo.git app && cd app",
+      # Must use inline env variables
+      "START_COMMAND=${var.START_COMMAND} PORT=${var.NODE_PORT} DB_USER=${var.DB_USER} DB_PASS=${var.DB_PASS} DB_HOST=${linode_instance.database2.ip_address} DB_PORT=${var.DB_PORT} DB_NAME=${var.DB_NAME} DOMAIN1=${var.DOMAIN1} bash ./terraform/server-init.sh"
     ]
   }
 }
 
 # Domain/DNS
-resource "linode_domain_record" "dns_record" {
-  domain_id = "${data.linode_domain.domain.id}"
+resource "linode_domain_record" "dns_record1" {
+  domain_id = "${data.linode_domain.domain1.id}"
   record_type = "A"
-  target = "${linode_instance.application.ip_address}"
+  target = "${linode_instance.application1.ip_address}"
+}
+resource "linode_domain_record" "dns_record2" {
+  domain_id = "${data.linode_domain.domain2.id}"
+  record_type = "A"
+  target = "${linode_instance.application2.ip_address}"
 }
 
 # Database
-resource "linode_stackscript" "db_setup" {
+resource "linode_stackscript" "db_setup1" {
   label = "${local.app_name}-db"
-  description = "Installs a Package"
+  description = "Sets up the database"
   script = <<EOF
 #!/bin/bash
 apt update && apt install postgresql -y && systemctl start postgresql.service;
@@ -127,9 +153,22 @@ sudo systemctl restart postgresql
 EOF
   images = ["linode/ubuntu20.04"]
 }
-# echo "host all all ${var.vpc_subnet_ip} md5" >> /etc/postgresql/12/main/pg_hba.conf
+resource "linode_stackscript" "db_setup2" {
+  label = "${local.app_name}-db"
+  description = "Sets up the database"
+  script = <<EOF
+#!/bin/bash
+apt update && apt install postgresql -y && systemctl start postgresql.service;
+sudo -u postgres createdb ${var.DB_NAME}
+sudo -u postgres psql -c "CREATE USER ${var.DB_USER} WITH ENCRYPTED PASSWORD '${var.DB_PASS}'; GRANT ALL PRIVILEGES ON DATABASE ${var.DB_NAME} TO ${var.DB_USER};"
+echo "listen_addresses = '*'" >> /etc/postgresql/12/main/postgresql.conf 
+echo "host all all ${var.vpc_subnet_ip} md5" >> /etc/postgresql/12/main/pg_hba.conf
+sudo systemctl restart postgresql
+EOF
+  images = ["linode/ubuntu20.04"]
+}
 
-resource "linode_instance" "database" {
+resource "linode_instance" "database1" {
   image = "linode/ubuntu20.04"
   type = "g6-nanode-1"
   label = "${local.app_name}-db"
@@ -138,14 +177,20 @@ resource "linode_instance" "database" {
   authorized_keys = [ linode_sshkey.ssh_key.ssh_key ]
   stackscript_id = linode_stackscript.db_setup.id
 }
+resource "linode_instance" "database2" {
+  image = "linode/ubuntu20.04"
+  type = "g6-nanode-1"
+  label = "${local.app_name}-db"
+  group = "${local.app_name}-group"
+  region = var.region
+  authorized_keys = [ linode_sshkey.ssh_key.ssh_key ]
+  stackscript_id = linode_stackscript.db_setup.id
 
-# - upload source files
-
-# resource "local_file" "env_file" {
-#   content  = <<EOT
-# DOMAIN=${var.DOMAIN}
-# DB_USER=${linode_database_postgresql.database.root_username}
-# DB_PASS=${linode_database_postgresql.database.root_password}
-# EOT
-#   filename = "${path.module}/.env"
-# }
+  interface {
+    purpose   = "vpc"
+    subnet_id = linode_vpc_subnet.vpc_subnet.id
+    ipv4 {
+      vpc = "10.0.0.3"
+    }
+  }
+}
