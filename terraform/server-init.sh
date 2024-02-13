@@ -19,7 +19,9 @@ pm2 startup
 npm install
 npm run build
 
-pm2 start $START_COMMAND
+# START_COMMAND = "npm run db.push && npm run db.seed && npm run serve"
+pm2 start "$START_COMMAND"
+# pm2 start "npm run db.push && npm run db.seed && npm run serve"
 
 # Install Caddy
 sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl

@@ -14,7 +14,7 @@ locals {
 variable "LINODE_TOKEN" {}
 variable "DOMAIN1" {}
 variable "DOMAIN2" {}
-variable "PORT" {}
+variable "NODE_PORT" {}
 variable "START_COMMAND" {}
 variable "DB_NAME" {}
 variable "DB_USER" {}
@@ -104,9 +104,10 @@ resource "null_resource" "configure_server1" {
   }
   provisioner "remote-exec" {
     inline = [
-      "git clone https://github.com/AustinGil/linode-vpc-demo.git app && cd app",
+      "git clone https://github.com/AustinGil/linode-vpc-demo.git app",
+      "cd app",
       # Must use inline env variables
-      "START_COMMAND=${var.START_COMMAND} PORT=${var.NODE_PORT} DB_USER=${var.DB_USER} DB_PASS=${var.DB_PASS} DB_HOST=${linode_instance.database1.ip_address} DB_PORT=${var.DB_PORT} DB_NAME=${var.DB_NAME} DOMAIN1=${var.DOMAIN1} bash ./terraform/server-init.sh"
+      "START_COMMAND=\"${var.START_COMMAND}\" PORT=${var.NODE_PORT} DB_USER=${var.DB_USER} DB_PASS=${var.DB_PASS} DB_HOST=${linode_instance.database1.ip_address} DB_PORT=${var.DB_PORT} DB_NAME=${var.DB_NAME} DOMAIN=${var.DOMAIN1} bash ./terraform/server-init.sh"
     ]
   }
 }
@@ -119,9 +120,10 @@ resource "null_resource" "configure_server2" {
   }
   provisioner "remote-exec" {
     inline = [
-      "git clone https://github.com/AustinGil/linode-vpc-demo.git app && cd app",
+      "git clone https://github.com/AustinGil/linode-vpc-demo.git app",
+      "cd app",
       # Must use inline env variables
-      "START_COMMAND=${var.START_COMMAND} PORT=${var.NODE_PORT} DB_USER=${var.DB_USER} DB_PASS=${var.DB_PASS} DB_HOST=${linode_instance.database2.ip_address} DB_PORT=${var.DB_PORT} DB_NAME=${var.DB_NAME} DOMAIN1=${var.DOMAIN1} bash ./terraform/server-init.sh"
+      "START_COMMAND=\"${var.START_COMMAND}\" PORT=${var.NODE_PORT} DB_USER=${var.DB_USER} DB_PASS=${var.DB_PASS} DB_HOST=${linode_instance.database2.ip_address} DB_PORT=${var.DB_PORT} DB_NAME=${var.DB_NAME} DOMAIN=${var.DOMAIN2} bash ./terraform/server-init.sh"
     ]
   }
 }
@@ -175,7 +177,7 @@ resource "linode_instance" "database1" {
   group = "${local.app_name}-group"
   region = var.region
   authorized_keys = [ linode_sshkey.ssh_key.ssh_key ]
-  stackscript_id = linode_stackscript.db_setup.id
+  stackscript_id = linode_stackscript.db_setup1.id
 }
 resource "linode_instance" "database2" {
   image = "linode/ubuntu20.04"
@@ -184,7 +186,7 @@ resource "linode_instance" "database2" {
   group = "${local.app_name}-group"
   region = var.region
   authorized_keys = [ linode_sshkey.ssh_key.ssh_key ]
-  stackscript_id = linode_stackscript.db_setup.id
+  stackscript_id = linode_stackscript.db_setup2.id
 
   interface {
     purpose   = "vpc"
