@@ -140,7 +140,7 @@ resource "linode_domain_record" "dns_record2" {
 
 # Database
 resource "linode_stackscript" "db_setup1" {
-  label = "${local.app_name}-db"
+  label = "${local.app_name}-db1"
   description = "Sets up the database"
   script = <<EOF
 #!/bin/bash
@@ -154,7 +154,7 @@ EOF
   images = ["linode/ubuntu20.04"]
 }
 resource "linode_stackscript" "db_setup2" {
-  label = "${local.app_name}-db"
+  label = "${local.app_name}-db2"
   description = "Sets up the database"
   script = <<EOF
 #!/bin/bash
@@ -171,7 +171,7 @@ EOF
 resource "linode_instance" "database1" {
   image = "linode/ubuntu20.04"
   type = "g6-nanode-1"
-  label = "${local.app_name}-db"
+  label = "${local.app_name}-db1"
   group = "${local.app_name}-group"
   region = var.region
   authorized_keys = [ linode_sshkey.ssh_key.ssh_key ]
@@ -180,7 +180,7 @@ resource "linode_instance" "database1" {
 resource "linode_instance" "database2" {
   image = "linode/ubuntu20.04"
   type = "g6-nanode-1"
-  label = "${local.app_name}-db"
+  label = "${local.app_name}-db2"
   group = "${local.app_name}-group"
   region = var.region
   authorized_keys = [ linode_sshkey.ssh_key.ssh_key ]
