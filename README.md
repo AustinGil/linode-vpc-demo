@@ -1,3 +1,13 @@
+# Linode VPC Demo Using Terraform
+
+This demo app provisions two application servers and two databases. One app+db pair is publicly available and the other lives within its own private VPC network, only exposing the app server to public traffic. As a result even if the database credentials get exposed, only other computers within the VPC network can access the database.
+
+The demo uses QwikCity for the application and Posgres for the database. We use Terraform to provision all infrastructure and put the source code into the servers. See `/terraform` folder.
+
+To provision your own app, copy the `/terraform/terraform.tfvars.example` file to `/terraform/terraform.tfvars` and set the appropriate configuration/environment variables.
+
+The following is the default README for QwikCity.
+
 # Qwik City App ⚡️
 
 - [Qwik Docs](https://qwik.builder.io/)
