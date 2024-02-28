@@ -3,7 +3,7 @@ import db, { schemaPokemon }from "./index.mjs";
 const pokemon = [
   {
     "id": 1,
-    "name": "Bulbasaur",
+    "name": "Allilord",
     "type": [
       "grass",
       "poison"
@@ -17,7 +17,7 @@ const pokemon = [
   },
   {
     "id": 2,
-    "name": "Ivysaur",
+    "name": "Gazelax",
     "type": [
       "grass",
       "poison"
@@ -31,7 +31,7 @@ const pokemon = [
   },
   {
     "id": 3,
-    "name": "Venusaur",
+    "name": "Dragius",
     "type": [
       "grass",
       "poison"
@@ -45,7 +45,7 @@ const pokemon = [
   },
   {
     "id": 4,
-    "name": "Charmander",
+    "name": "Jagevoir",
     "type": [
       "fire"
     ],
@@ -58,7 +58,7 @@ const pokemon = [
   },
   {
     "id": 5,
-    "name": "Charmeleon",
+    "name": "Hippomish",
     "type": [
       "fire"
     ],
@@ -71,7 +71,7 @@ const pokemon = [
   },
   {
     "id": 6,
-    "name": "Charizard",
+    "name": "Dinobite",
     "type": [
       "fire",
       "flying"
@@ -85,7 +85,7 @@ const pokemon = [
   },
   {
     "id": 7,
-    "name": "Squirtle",
+    "name": "Komodix",
     "type": [
       "water"
     ],
@@ -98,7 +98,7 @@ const pokemon = [
   },
   {
     "id": 8,
-    "name": "Wartortle",
+    "name": "Chimpola",
     "type": [
       "water"
     ],
@@ -111,7 +111,7 @@ const pokemon = [
   },
   {
     "id": 9,
-    "name": "Blastoise",
+    "name": "Magirilla",
     "type": [
       "water"
     ],
