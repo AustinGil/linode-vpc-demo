@@ -73,16 +73,6 @@ resource "linode_stackscript" "configure_app_server" {
 # <UDF name="DB_USER" label="Database username" default="">
 # <UDF name="DB_PASS" label="Database password" default="">
 # <UDF name="DOMAIN" label="Domain for the application" default="">
-echo "$DOMAIN
-$GIT_REPO
-$START_COMMAND
-$NODE_PORT
-$DB_HOST
-$DB_PORT
-$DB_NAME
-$DB_USER
-$DB_PASS
-" > temp.txt
 sudo apt update
 # Install NVM
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
