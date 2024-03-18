@@ -2,9 +2,11 @@
 
 This demo app provisions two application servers and two databases. One app+db pair is publicly available and the other lives within its own private VPC network, only exposing the app server to public traffic. As a result even if the database credentials get exposed, only other computers within the VPC network can access the database.
 
-The demo uses QwikCity for the application and Posgres for the database. We use Terraform to provision all infrastructure and put the source code into the servers. See `/terraform` folder.
+The demo’s front end is built with [Qwik](https://qwik.dev/) and uses [Tailwind](https://tailwindcss.com/) for styling. The server side is powered by [Qwik City](https://qwik.dev/docs/qwikcity/) (Qwik’s official meta-framework) and runs on [Node.js](https://nodejs.org/) hosted on a [shared Linode VPS](https://www.linode.com/products/shared/). The apps also use [PM2](https://pm2.io/) for process management and [Caddy](https://caddyserver.com/) as a reverse proxy and SSL provisioner. The data is stored in a PostgreS[QL](https://www.postgresql.org/) database that also runs on a shared Lindode VPS. They interact with the database using [Drizzle](https://orm.drizzle.team/) Object-Relational Mapping (ORM). The entire infrastructure for each app is managed with [Terraform](https://www.terraform.io/) using the [Terraform Linode provider](https://registry.terraform.io/providers/linode/linode/latest/docs). See the `/terraform` folder for more details.
 
 To provision your own app, copy the `/terraform/terraform.tfvars.example` file to `/terraform/terraform.tfvars` and set the appropriate configuration/environment variables.
+
+Each app’s front end is built with Qwik and uses Tailwind for styling. The server side is powered by Qwik City (Qwik’s official meta-framework) and runs on Node.js hosted on a shared Linode VPS. The apps also use PM2 for process management and Caddy as a reverse proxy and SSL provisioner. The data is stored in a PostgreSQL database that also runs on a shared Lindode VPS. They interact with the database using Drizzle Object-Relational Mapping (ORM). The entire infrastructure for each app is managed with Terraform using the Terraform Linode provider, which was new to me, but made provisioning and destroying infrastructure really fast and easy (once I learned how it all worked).
 
 The following is the default README for QwikCity.
 
