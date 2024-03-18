@@ -6,8 +6,6 @@ The demo’s front end is built with [Qwik](https://qwik.dev/) and uses [Tailwin
 
 To provision your own app, copy the `/terraform/terraform.tfvars.example` file to `/terraform/terraform.tfvars` and set the appropriate configuration/environment variables.
 
-Each app’s front end is built with Qwik and uses Tailwind for styling. The server side is powered by Qwik City (Qwik’s official meta-framework) and runs on Node.js hosted on a shared Linode VPS. The apps also use PM2 for process management and Caddy as a reverse proxy and SSL provisioner. The data is stored in a PostgreSQL database that also runs on a shared Lindode VPS. They interact with the database using Drizzle Object-Relational Mapping (ORM). The entire infrastructure for each app is managed with Terraform using the Terraform Linode provider, which was new to me, but made provisioning and destroying infrastructure really fast and easy (once I learned how it all worked).
-
 The following is the default README for QwikCity.
 
 # Qwik City App ⚡️
