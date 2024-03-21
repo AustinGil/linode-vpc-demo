@@ -14,7 +14,7 @@ import { manifest } from "@qwik-client-manifest";
 import { createServer } from "node:http";
 
 // Allow for dynamic port
-const PORT = process.env.PORT ?? 3004;
+const PORT = process.env.NODE_PORT ?? 3000;
 
 // Create the Qwik City express middleware
 const { router, notFound, staticFile } = createQwikCity({

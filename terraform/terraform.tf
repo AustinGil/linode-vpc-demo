@@ -1,3 +1,55 @@
+# Variables & Data
+variable "LINODE_TOKEN" {
+  sensitive = true
+}
+variable "REGION" {
+  # see https://www.linode.com/docs/products/networking/vpc/#availability
+  type = string
+}
+variable "VPC_SUBNET_IP_RANGE" {
+  type = string
+  default = "10.0.0.0/24"
+}
+variable "GIT_REPO" {}
+variable "START_COMMAND" {}
+variable "NODE_PORT" {
+  type = string
+  default = "3000"
+}
+variable "DB_NAME" {
+  sensitive = true
+}
+variable "DB_USER" {
+  sensitive = true
+}
+variable "DB_PASS" {
+  sensitive = true
+}
+variable "DB_PORT" {
+  type = string
+  default = 5432
+  sensitive = true
+}
+variable "DOMAIN" {}
+variable "INSTANCE_TYPE" {
+  # see https://api.linode.com/v4/linode/types
+  type = string
+  default = "g6-nanode-1"
+}
+variable "DB_SERVER_PRIVATE_IP" {
+  type = string
+  default = "10.0.0.3"
+}
+variable "APP_NAME" {
+  type = string
+  default = "tfVpcDemo"
+}
+variable "SSH_KEYS" {
+  type = set(string)
+  default = []
+}
+
+# Configure the Linode Provider
 terraform {
   required_providers {
     linode = {
@@ -6,61 +58,24 @@ terraform {
     }
   }
 }
-
-# Variables & Data
-locals {
-  app_name = "tfVpcDemo"
-}
-variable "LINODE_TOKEN" {}
-variable "DOMAIN1" {}
-variable "DOMAIN2" {}
-variable "GIT_REPO" {}
-variable "NODE_PORT" {}
-variable "START_COMMAND" {}
-variable "DB_NAME" {}
-variable "DB_USER" {}
-variable "DB_PASS" {}
-variable "DB_PORT" {
-  type = string
-  default = 5432
-}
-variable "REGION" {
-  type = string
-  default = "us-sea" # see https://api.linode.com/v4/regions
-}
-variable "VPC_SUBNET_IP" {
-  type = string
-  default = "10.0.0.0/24"
-}
-variable "DB_PRIVATE_IP" {
-  type = string
-  default = "10.0.0.3"
-}
-
-# Configure the Linode Provider
 provider "linode" {
   token = var.LINODE_TOKEN
 }
 
-resource "linode_sshkey" "ssh_key" {
-  label = "my_ssh_key"
-  ssh_key = chomp(file("~/.ssh/id_ed25519.pub"))
-}
-
 # Private network (VPC)
 resource "linode_vpc" "vpc" {
-  label = "${local.app_name}-vpc"
+  label = "${var.APP_NAME}-vpc"
   region = var.REGION
 }
 resource "linode_vpc_subnet" "vpc_subnet" {
   vpc_id = linode_vpc.vpc.id
-  label = "${local.app_name}-vpc-subnet"
-  ipv4 = "${var.VPC_SUBNET_IP}"
+  label = "${var.APP_NAME}-vpc-subnet"
+  ipv4 = "${var.VPC_SUBNET_IP_RANGE}"
 }
 
 # Application servers
 resource "linode_stackscript" "configure_app_server" {
-  label = "setup-${local.app_name}-server"
+  label = "setup-${var.APP_NAME}-server"
   description = "Sets up the application server"
   script = <<EOF
 #! /bin/bash
@@ -107,48 +122,24 @@ systemctl reload caddy
 EOF
   images = ["linode/ubuntu20.04"]
 }
-resource "linode_instance" "application1" {
+resource "linode_instance" "application" {
   depends_on = [
-    linode_instance.database1
+    linode_instance.database
   ]
   image = "linode/ubuntu20.04"
-  type = "g6-nanode-1"
-  label = "${local.app_name}-application1"
-  group = "${local.app_name}-group"
+  type = var.INSTANCE_TYPE
+  label = "${var.APP_NAME}-application"
+  group = "${var.APP_NAME}-group"
   region = var.REGION
-  authorized_keys = [ linode_sshkey.ssh_key.ssh_key ]
+  authorized_keys = var.SSH_KEYS
 
   stackscript_id = linode_stackscript.configure_app_server.id
   stackscript_data = {
     "GIT_REPO" = var.GIT_REPO,
     "START_COMMAND" = var.START_COMMAND,
-    "DOMAIN" = var.DOMAIN1,
+    "DOMAIN" = var.DOMAIN,
     "NODE_PORT" = var.NODE_PORT,
-    "DB_HOST" = linode_instance.database1.ip_address,
-    "DB_PORT" = var.DB_PORT,
-    "DB_NAME" = var.DB_NAME,
-    "DB_USER" = var.DB_USER,
-    "DB_PASS" = var.DB_PASS,
-  }
-}
-resource "linode_instance" "application2" {
-  depends_on = [
-    linode_instance.database2
-  ]
-  image = "linode/ubuntu20.04"
-  type = "g6-nanode-1"
-  label = "${local.app_name}-application2"
-  group = "${local.app_name}-group"
-  region = var.REGION
-  authorized_keys = [ linode_sshkey.ssh_key.ssh_key ]
-
-  stackscript_id = linode_stackscript.configure_app_server.id
-  stackscript_data = {
-    "GIT_REPO" = var.GIT_REPO,
-    "START_COMMAND" = var.START_COMMAND,
-    "DOMAIN" = var.DOMAIN2,
-    "NODE_PORT" = var.NODE_PORT,
-    "DB_HOST" = var.DB_PRIVATE_IP,
+    "DB_HOST" = var.DB_SERVER_PRIVATE_IP,
     "DB_PORT" = var.DB_PORT,
     "DB_NAME" = var.DB_NAME,
     "DB_USER" = var.DB_USER,
@@ -166,55 +157,37 @@ resource "linode_instance" "application2" {
 
 # Database servers
 resource "linode_stackscript" "configure_db_server" {
-  label = "setup-${local.app_name}-db"
+  label = "setup-${var.APP_NAME}-db"
   description = "Sets up the database"
   script = <<EOF
 #!/bin/bash
 # <UDF name="DB_NAME" label="Database name" default="">
 # <UDF name="DB_USER" label="Database user" default="">
 # <UDF name="DB_PASS" label="Database password" default="">
-# <UDF name="PG_HBA_ENTRY" label="Line to add to pg_hba.conf" example="host all all all md5" default="">
 apt update && apt install postgresql -y && systemctl start postgresql.service;
 sudo -u postgres createdb $DB_NAME
 sudo -u postgres psql -c "CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DB_PASS'; GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
 echo "# listen on all interfaces" >> /etc/postgresql/12/main/postgresql.conf
 echo "listen_addresses = '*'" >> /etc/postgresql/12/main/postgresql.conf
 echo "# allow connections from all hosts" >> /etc/postgresql/12/main/pg_hba.conf
-echo "$PG_HBA_ENTRY" >> /etc/postgresql/12/main/pg_hba.conf
+echo "host all all samenet md5" >> /etc/postgresql/12/main/pg_hba.conf
 sudo systemctl restart postgresql
 EOF
   images = ["linode/ubuntu20.04"]
 }
-resource "linode_instance" "database1" {
+resource "linode_instance" "database" {
   image = "linode/ubuntu20.04"
-  type = "g6-nanode-1"
-  label = "${local.app_name}-db1"
-  group = "${local.app_name}-group"
+  type = var.INSTANCE_TYPE
+  label = "${var.APP_NAME}-db"
+  group = "${var.APP_NAME}-group"
   region = var.REGION
-
-  authorized_keys = [ linode_sshkey.ssh_key.ssh_key ]
-  stackscript_id = linode_stackscript.configure_db_server.id
-  stackscript_data = {
-    "DB_NAME" = var.DB_NAME,
-    "DB_USER" = var.DB_USER,
-    "DB_PASS" = var.DB_PASS,
-    "PG_HBA_ENTRY" = "host all all all md5"
-  }
-}
-resource "linode_instance" "database2" {
-  image = "linode/ubuntu20.04"
-  type = "g6-nanode-1"
-  label = "${local.app_name}-db2"
-  group = "${local.app_name}-group"
-  region = var.REGION
-  authorized_keys = [ linode_sshkey.ssh_key.ssh_key ]
+  authorized_keys = var.SSH_KEYS
 
   stackscript_id = linode_stackscript.configure_db_server.id
   stackscript_data = {
     "DB_NAME" = var.DB_NAME,
     "DB_USER" = var.DB_USER,
     "DB_PASS" = var.DB_PASS,
-    "PG_HBA_ENTRY" = "host all all samenet md5"
   }
 
   interface {
@@ -224,25 +197,17 @@ resource "linode_instance" "database2" {
     purpose   = "vpc"
     subnet_id = linode_vpc_subnet.vpc_subnet.id
     ipv4 {
-      vpc = var.DB_PRIVATE_IP
+      vpc = var.DB_SERVER_PRIVATE_IP
     }
   }
 }
 
 # Domain/DNS
-data "linode_domain" "domain1" {
-  domain = var.DOMAIN1
+data "linode_domain" "domain" {
+  domain = var.DOMAIN
 }
-data "linode_domain" "domain2" {
-  domain = var.DOMAIN2
-}
-resource "linode_domain_record" "dns_record1" {
-  domain_id = "${data.linode_domain.domain1.id}"
+resource "linode_domain_record" "dns_record" {
+  domain_id = "${data.linode_domain.domain.id}"
   record_type = "A"
-  target = "${linode_instance.application1.ip_address}"
-}
-resource "linode_domain_record" "dns_record2" {
-  domain_id = "${data.linode_domain.domain2.id}"
-  record_type = "A"
-  target = "${linode_instance.application2.ip_address}"
+  target = "${linode_instance.application.ip_address}"
 }

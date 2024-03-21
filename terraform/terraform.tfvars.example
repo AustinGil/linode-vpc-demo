@@ -1,9 +1,18 @@
+# Required
 LINODE_TOKEN = ""
-DOMAIN1 = ""
-DOMAIN2 = ""
+REGION = "" # see https://www.linode.com/docs/products/networking/vpc/#availability
 GIT_REPO = ""
 START_COMMAND = ""
-NODE_PORT = ""
 DB_NAME = ""
 DB_USER = ""
 DB_PASS = ""
+DOMAIN = ""
+
+# Recommended
+# SSH_KEYS = [] # example: ["ssh-ed25519 AAAAfsdmlsaJDFJOMM44843T/DIJ934JIASIJSDFSADPFJ34I43F9FDFISDADF you@your-machine"]
+
+# Optional
+# VPC_SUBNET_IP_RANGE = ""
+# NODE_PORT = ""
+# INSTANCE_TYPE = "" # see https://api.linode.com/v4/linode/types
+# APP_NAME = ""
